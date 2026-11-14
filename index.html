@@ -1,0 +1,248 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Totito</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #101827;
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 30px;
+        }
+
+        h1 {
+            color: #67e8c2;
+            font-size: 40px;
+        }
+
+        .contenedor {
+            max-width: 400px;
+            margin: auto;
+            background: #1b2940;
+            padding: 25px;
+            border-radius: 20px;
+        }
+
+        .tablero {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 25px auto;
+        }
+
+        .casilla {
+            width: 100%;
+            aspect-ratio: 1;
+            font-size: 50px;
+            font-weight: bold;
+            border: none;
+            border-radius: 12px;
+            background: #263852;
+            color: white;
+            cursor: pointer;
+        }
+
+        .casilla:hover {
+            background: #405673;
+        }
+
+        .x {
+            color: #ffbd69;
+        }
+
+        .o {
+            color: #78b7ff;
+        }
+
+        #mensaje {
+            font-size: 22px;
+            margin: 20px;
+        }
+
+        button.reiniciar {
+            background: #67e8c2;
+            color: #10251f;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .marcador {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+
+        .marcador p {
+            font-size: 18px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="contenedor">
+
+        <h1>Juego de Totito</h1>
+
+        <p>¡Tres en línea para ganar!</p>
+
+        <div class="marcador">
+            <p>Jugador X: <span id="puntosX">0</span></p>
+            <p>Jugador O: <span id="puntosO">0</span></p>
+        </div>
+
+        <h2 id="mensaje">Turno del jugador X</h2>
+
+        <div class="tablero">
+            <button class="casilla" onclick="jugar(0)"></button>
+            <button class="casilla" onclick="jugar(1)"></button>
+            <button class="casilla" onclick="jugar(2)"></button>
+
+            <button class="casilla" onclick="jugar(3)"></button>
+            <button class="casilla" onclick="jugar(4)"></button>
+            <button class="casilla" onclick="jugar(5)"></button>
+
+            <button class="casilla" onclick="jugar(6)"></button>
+            <button class="casilla" onclick="jugar(7)"></button>
+            <button class="casilla" onclick="jugar(8)"></button>
+        </div>
+
+        <button class="reiniciar" onclick="reiniciar()">
+            Nueva partida
+        </button>
+
+        <button class="reiniciar" onclick="reiniciarMarcador()">
+            Reiniciar marcador
+        </button>
+
+    </div>
+
+    <script>
+        let tablero = ["", "", "", "", "", "", "", "", ""];
+
+        let jugador = "X";
+        let juegoActivo = true;
+
+        let puntosX = 0;
+        let puntosO = 0;
+
+        const combinacionesGanadoras = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+
+        function jugar(posicion) {
+
+            if (!juegoActivo || tablero[posicion] !== "") {
+                return;
+            }
+
+            tablero[posicion] = jugador;
+
+            let casillas = document.querySelectorAll(".casilla");
+
+            casillas[posicion].textContent = jugador;
+
+            casillas[posicion].classList.add(
+                jugador.toLowerCase()
+            );
+
+            if (verificarGanador()) {
+
+                document.getElementById("mensaje").textContent =
+                    "¡Ganó el jugador " + jugador + "!";
+
+                if (jugador === "X") {
+                    puntosX++;
+                    document.getElementById("puntosX").textContent = puntosX;
+                } else {
+                    puntosO++;
+                    document.getElementById("puntosO").textContent = puntosO;
+                }
+
+                juegoActivo = false;
+                return;
+            }
+
+            if (!tablero.includes("")) {
+
+                document.getElementById("mensaje").textContent =
+                    "¡Empate!";
+
+                juegoActivo = false;
+                return;
+            }
+
+            jugador = jugador === "X" ? "O" : "X";
+
+            document.getElementById("mensaje").textContent =
+                "Turno del jugador " + jugador;
+        }
+
+        function verificarGanador() {
+
+            return combinacionesGanadoras.some(combinacion => {
+
+                return combinacion.every(posicion => {
+
+                    return tablero[posicion] === jugador;
+
+                });
+
+            });
+
+        }
+
+        function reiniciar() {
+
+            tablero = ["", "", "", "", "", "", "", "", ""];
+
+            jugador = "X";
+            juegoActivo = true;
+
+            let casillas = document.querySelectorAll(".casilla");
+
+            casillas.forEach(casilla => {
+
+                casilla.textContent = "";
+                casilla.classList.remove("x", "o");
+
+            });
+
+            document.getElementById("mensaje").textContent =
+                "Turno del jugador X";
+
+        }
+
+        function reiniciarMarcador() {
+
+            puntosX = 0;
+            puntosO = 0;
+
+            document.getElementById("puntosX").textContent = 0;
+            document.getElementById("puntosO").textContent = 0;
+
+            reiniciar();
+
+        }
+    </script>
+
+</body>
+</html>
